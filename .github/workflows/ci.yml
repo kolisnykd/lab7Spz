@@ -26,7 +26,11 @@ jobs:
         pip install -r requirements.txt
 
     - name: Запуск тестів
-      run: pytest  # автоматичне тестування
+        export PYTHONPATH=$(pwd):$PYTHONPATH
+        pytest  # автоматичне тестування
+      run:
+        export PYTHONPATH=$(pwd):$PYTHONPATH
+        pytest  # автоматичне тестування
 
   # друге завдання: збірка Docker образу та симуляція деплою
   docker-build-deploy-simulate:
