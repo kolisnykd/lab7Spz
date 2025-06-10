@@ -1,14 +1,14 @@
-#Назва пайплайна
+# Назва пайплайна
 name: CI/CD for Python App
 
-# Умови запуску при пуші в гілку main або pull request
+# Умови запуску: при пуші в гілку main або pull request
 on:
   push:
     branches: [main]
   pull_request:
 
 jobs:
-  # перше завдання: збірка і тестування
+  # 1. Завдання: збірка і тестування коду
   build-and-test:
     runs-on: ubuntu-latest  # середовище виконання
     steps:
@@ -26,15 +26,14 @@ jobs:
         pip install -r requirements.txt
 
     - name: Запуск тестів
-        export PYTHONPATH=$(pwd):$PYTHONPATH
-        pytest  # автоматичне тестування
-      run:
+      run: |
+        # Додаємо поточну робочу директорію до PYTHONPATH
         export PYTHONPATH=$(pwd):$PYTHONPATH
         pytest  # автоматичне тестування
 
-  # друге завдання: збірка Docker образу та симуляція деплою
-  docker-build-deploy-simulate:
-    needs: build-and-test  # виконується лише після успішного тестування
+  # 2. Завдання: збірка Docker-образу
+  docker-build:
+    needs: build-and-test  # Виконується лише після успішного тестування
     runs-on: ubuntu-latest
     steps:
     - name: Клонування репозиторію
@@ -43,10 +42,19 @@ jobs:
     - name: Побудова Docker-образу
       run: docker build -t my-python-app .
 
+  # 3. Завдання: симуляція розгортання (деплою)
+  deploy:
+    needs: docker-build  # Виконується лише після успішної збірки Docker-образу
+    runs-on: ubuntu-latest
+    steps:
     - name: Симуляція деплою на staging-сервер
       run: echo "Деплой на staging-сервер виконано успішно (імітація)"
 
-    # за вар.: Відправка нотифікації в Telegram про успішне завершення
+  # 4. Завдання: Відправка нотифікації в Telegram
+  telegram-notification:
+    needs: deploy  # Виконується лише після успішного розгортання
+    runs-on: ubuntu-latest
+    steps:
     - name: Відправка Telegram нотифікації
       uses: appleboy/telegram-action@master
       with:
