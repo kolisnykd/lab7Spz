@@ -1,0 +1,57 @@
+#Назва пайплайна
+name: CI/CD for Python App
+
+# Умови запуску при пуші в гілку main або pull request
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  # перше завдання: збірка і тестування
+  build-and-test:
+    runs-on: ubuntu-latest  # середовище виконання
+    steps:
+    - name: Клонування репозиторію
+      uses: actions/checkout@v3
+
+    - name: Встановлення Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Встановлення залежностей
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Запуск тестів
+      run: pytest  # автоматичне тестування
+
+  # друге завдання: збірка Docker образу та симуляція деплою
+  docker-build-deploy-simulate:
+    needs: build-and-test  # виконується лише після успішного тестування
+    runs-on: ubuntu-latest
+    steps:
+    - name: Клонування репозиторію
+      uses: actions/checkout@v3
+
+    - name: Побудова Docker-образу
+      run: docker build -t my-python-app .
+
+    - name: Симуляція деплою на staging-сервер
+      run: echo "Деплой на staging-сервер виконано успішно (імітація)"
+
+    # за вар.: Відправка нотифікації в Telegram про успішне завершення
+    - name: Відправка Telegram нотифікації
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_CHAT_ID }}
+        token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        message: |
+          ✅ CI/CD успішно завершено!
+          Репозиторій: ${{ github.repository }}
+          Коміт: ${{ github.sha }}
+          Повідомлення: ${{ github.event.head_commit.message }}
+          Переглянути Action: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        disable_web_page_preview: true
