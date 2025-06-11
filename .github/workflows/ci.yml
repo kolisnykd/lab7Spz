@@ -8,9 +8,9 @@ on:
   pull_request:
 
 jobs:
-  # 1. Завдання: збірка і тестування коду
+  # 1. Завдання: збірка і тестування код
   build-and-test:
-    runs-on: ubuntu-latest  # середовище виконання
+    runs-on: ubuntu-latest  # середовище виконанн
     steps:
     - name: Клонування репозиторію
       uses: actions/checkout@v3
