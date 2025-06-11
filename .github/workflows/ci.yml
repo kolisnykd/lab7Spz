@@ -8,7 +8,7 @@ on:
   pull_request:
 
 jobs:
-  # 1. Завдання: збірка і тестування код
+  # 1. Завдання: збірка і тестування ко
   build-and-test:
     runs-on: ubuntu-latest  # середовище виконанн
     steps:
